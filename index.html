@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Term Timetable</title>
+<style>
+  :root{
+    --bg:#f6f3ea; --surface:#ffffff; --surface-2:#efe9d8;
+    --ink:#1e2333; --ink-2:#4d5266; --muted:#7c8194;
+    --line:#ddd4bd; --line-2:#cfc5a9;
+    --accent:#2c5f8a; --accent-ink:#ffffff; --gold:#b8842f;
+    --danger:#b23b2e; --danger-bg:#fbe7e2;
+    --warn:#9c6b1f; --warn-bg:#f8ecd4;
+    --ok:#2f7d4f;
+    --c-finance:#2c5f8a; --c-marketing:#9c3f68; --c-strategy:#3f7d55;
+    --c-operations:#a15b23; --c-ob:#6a4c93; --c-economics:#1f6f66;
+    --radius:10px; --radius-sm:6px;
+    --shadow:0 1px 2px rgba(30,35,51,.07),0 8px 20px -10px rgba(30,35,51,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161c; --surface:#1a2028; --surface-2:#212833;
+      --ink:#eae6da; --ink-2:#b9bdc9; --muted:#8890a0;
+      --line:#2b323d; --line-2:#343d49;
+      --accent:#6ea3cf; --accent-ink:#0c1116; --gold:#d7a95c;
+      --danger:#e07a68; --danger-bg:#3a201d;
+      --warn:#e0b866; --warn-bg:#3a3120;
+      --ok:#7fc79a;
+      --c-finance:#6ea3cf; --c-marketing:#d488ab; --c-strategy:#7fc79a;
+      --c-operations:#e0a876; --c-ob:#b09bdb; --c-economics:#6fc2b6;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -10px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161c; --surface:#1a2028; --surface-2:#212833;
+    --ink:#eae6da; --ink-2:#b9bdc9; --muted:#8890a0;
+    --line:#2b323d; --line-2:#343d49;
+    --accent:#6ea3cf; --accent-ink:#0c1116; --gold:#d7a95c;
+    --danger:#e07a68; --danger-bg:#3a201d;
+    --warn:#e0b866; --warn-bg:#3a3120;
+    --ok:#7fc79a;
+    --c-finance:#6ea3cf; --c-marketing:#d488ab; --c-strategy:#7fc79a;
+    --c-operations:#e0a876; --c-ob:#b09bdb; --c-economics:#6fc2b6;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -10px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Source Sans 3",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    padding-inline:20px; padding-block:20px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;}
+  [hidden]{display:none !important;}
+  h1,h2,h3{font-family:"Newsreader",Georgia,"Times New Roman",serif; font-weight:600; text-wrap:balance; margin:0;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; font-variant-numeric:tabular-nums;}
+  button{font:inherit; cursor:pointer;}
+  input,select{font:inherit;}
+  a{color:var(--accent);}
+
+  .wrap{max-width:1180px; margin-inline:auto; display:flex; flex-direction:column; gap:20px;}
+
+  /* header */
+  .topbar{
+    display:flex; flex-wrap:wrap; gap:16px 24px; align-items:flex-end; justify-content:space-between;
+    border-bottom:1px solid var(--line); padding-bottom:16px;
+  }
+  .brand{display:flex; flex-direction:column; gap:4px;}
+  .brand .eyebrow{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600;}
+  .brand h1{font-size:26px; line-height:1.15;}
+  .brand .term{font-size:14px; color:var(--ink-2); font-style:italic; font-family:"Newsreader",serif;}
+  .stats{display:flex; gap:10px; flex-wrap:wrap;}
+  .stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:8px 12px; min-width:96px; box-shadow:var(--shadow);
+  }
+  .stat .n{font-family:"IBM Plex Mono",monospace; font-size:19px; font-weight:600; line-height:1;}
+  .stat .l{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-top:3px;}
+  .stat.conflict .n{color:var(--danger);}
+  .stat.conflict{border-color:var(--danger); cursor:pointer; background:var(--danger-bg);}
+
+  /* tabs */
+  .tabs{display:flex; gap:4px; border-bottom:1px solid var(--line);}
+  .tab{
+    padding:9px 16px; background:none; border:none; border-bottom:2px solid transparent;
+    color:var(--muted); font-weight:600; font-size:14px; margin-bottom:-1px;
+  }
+  .tab.active{color:var(--ink); border-color:var(--accent);}
+  .tab:hover:not(.active){color:var(--ink-2);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* timetable layout */
+  .tt-layout{display:grid; grid-template-columns:1fr 260px; gap:20px; align-items:start;}
+  @media (max-width:860px){ .tt-layout{grid-template-columns:1fr;} }
+
+  .grid-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow);}
+  table.grid{border-collapse:collapse; width:100%; min-width:720px;}
+  table.grid th, table.grid td{border:1px solid var(--line); vertical-align:top;}
+  table.grid thead th{
+    background:var(--surface-2); font-family:"Newsreader",serif; font-weight:600; font-size:14px;
+    padding:10px 8px; text-align:center; position:sticky; top:0; z-index:2;
+  }
+  table.grid .time-col{
+    width:96px; background:var(--surface-2); text-align:right; padding:8px 10px;
+    font-size:12px; color:var(--ink-2); white-space:nowrap; position:sticky; left:0; z-index:1;
+  }
+  table.grid thead th.time-col{z-index:3;}
+  table.grid .time-col .p{font-weight:600; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:2px;}
+  table.grid td.cell{
+    width:150px; min-width:150px; height:76px; padding:5px; position:relative;
+  }
+  .cell-inner{display:flex; flex-direction:column; gap:4px; height:100%;}
+  .chip{
+    border-radius:7px; padding:5px 7px; font-size:12px; line-height:1.3; cursor:pointer;
+    border-left:3px solid transparent; position:relative; color:#fff;
+  }
+  .chip .code{font-weight:700; font-family:"IBM Plex Mono",monospace; font-size:11.5px; display:block;}
+  .chip .meta{opacity:.92; font-size:10.5px; display:block; margin-top:1px;}
+  .chip.conflict{outline:2px solid var(--danger); outline-offset:-2px;}
+  .chip .flag{position:absolute; top:3px; right:4px; font-size:10px;}
+  .add-btn{
+    border:1.5px dashed var(--line-2); background:transparent; color:var(--muted);
+    border-radius:7px; flex:1; min-height:22px; font-size:16px; line-height:1;
+    display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .12s;
+  }
+  td.cell:hover .add-btn{opacity:1;}
+  td.cell:focus-within .add-btn{opacity:1;}
+  .add-btn:hover{background:var(--surface-2); color:var(--ink); border-color:var(--accent);}
+
+  .c-finance{background:var(--c-finance);} .c-marketing{background:var(--c-marketing);}
+  .c-strategy{background:var(--c-strategy);} .c-operations{background:var(--c-operations);}
+  .c-ob{background:var(--c-ob);} .c-economics{background:var(--c-economics);}
+
+  /* side rail */
+  .rail{display:flex; flex-direction:column; gap:16px;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow);}
+  .card h3{font-size:15px; margin-bottom:10px;}
+  .card h3 .cnt{color:var(--muted); font-weight:400; font-size:13px;}
+  .legend{display:flex; flex-wrap:wrap; gap:7px 10px; margin-top:4px;}
+  .legend .sw{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ink-2);}
+  .legend .dot{width:9px; height:9px; border-radius:3px; display:inline-block;}
+
+  .unsched-item{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:8px 0; border-top:1px solid var(--line);
+  }
+  .unsched-item:first-of-type{border-top:none;}
+  .unsched-item .u-name{font-size:13px;}
+  .unsched-item .u-code{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:12px;}
+  .unsched-item .u-sub{color:var(--muted); font-size:11.5px;}
+  .btn-sm{
+    background:var(--surface-2); border:1px solid var(--line-2); color:var(--ink);
+    border-radius:6px; padding:4px 9px; font-size:12px; font-weight:600; white-space:nowrap;
+  }
+  .btn-sm:hover{border-color:var(--accent); color:var(--accent);}
+  .empty-note{color:var(--muted); font-size:13px; font-style:italic;}
+
+  /* buttons */
+  .btn{
+    background:var(--accent); color:var(--accent-ink); border:none; border-radius:8px;
+    padding:9px 16px; font-weight:600; font-size:14px;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.warn{background:var(--warn); color:#241a04;}
+  .btn.ghost{background:transparent; color:var(--ink-2); border:1px solid var(--line-2);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent);}
+  .btn.danger-outline{background:transparent; color:var(--danger); border:1px solid var(--danger);}
+  .btn.danger-outline:hover{background:var(--danger-bg);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+
+  /* setup panel */
+  .setup-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:780px){ .setup-grid{grid-template-columns:1fr;} }
+  .list-row{
+    display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center;
+    padding:9px 0; border-top:1px solid var(--line);
+  }
+  .list-row:first-of-type{border-top:none;}
+  .list-row .main{font-size:13.5px;}
+  .list-row .sub{color:var(--muted); font-size:12px;}
+  .row-actions{display:flex; gap:6px;}
+  .row-actions button{
+    background:none; border:none; color:var(--muted); font-size:12px; padding:2px 5px; border-radius:5px;
+  }
+  .row-actions button:hover{color:var(--accent); background:var(--surface-2);}
+  .row-actions button.del:hover{color:var(--danger);}
+  .field{display:flex; flex-direction:column; gap:4px; margin-bottom:10px;}
+  .field label{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); font-weight:600;}
+  .field input, .field select{
+    background:var(--bg); border:1px solid var(--line-2); border-radius:7px; padding:8px 10px;
+    color:var(--ink); font-size:13.5px;
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .field-row{display:flex; gap:10px;}
+  .field-row .field{flex:1;}
+  .inline-form{border-top:1px dashed var(--line-2); margin-top:10px; padding-top:12px;}
+
+  /* modal */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(18,22,28,.5); display:none;
+    align-items:center; justify-content:center; padding:20px; z-index:50;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal{
+    background:var(--surface); border-radius:var(--radius); max-width:420px; width:100%;
+    padding:20px 22px; box-shadow:0 20px 60px -15px rgba(0,0,0,.4); max-height:90vh; overflow-y:auto;
+  }
+  .modal h3{font-size:17px; margin-bottom:14px;}
+  .warn-box{
+    background:var(--warn-bg); border:1px solid var(--warn); color:var(--warn);
+    border-radius:7px; padding:9px 11px; font-size:12.5px; margin-bottom:12px; display:none;
+  }
+  .warn-box.show{display:block;}
+  .modal-actions{display:flex; justify-content:space-between; gap:8px; margin-top:16px;}
+  .modal-actions .left{display:flex; gap:8px;}
+
+  .toast{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(8px);
+    background:var(--ink); color:var(--bg); padding:9px 16px; border-radius:8px; font-size:13px;
+    opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; z-index:60;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <span class="eyebrow">Registrar &middot; Class Scheduling</span>
+      <h1 id="school-name">Meridian School of Business</h1>
+      <span class="term" id="school-term">Fall Term 2026 — MBA Term III</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n mono" id="stat-classes">0</div><div class="l">Scheduled</div></div>
+      <div class="stat"><div class="n mono" id="stat-unsched">0</div><div class="l">Unscheduled</div></div>
+      <div class="stat conflict" id="stat-conflicts-box" title="Click to view first conflict"><div class="n mono" id="stat-conflicts">0</div><div class="l">Conflicts</div></div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="timetable" role="tab">Timetable</button>
+    <button class="tab" data-tab="setup" role="tab">Courses, Faculty &amp; Rooms</button>
+  </nav>
+
+  <section class="panel active" id="panel-timetable">
+    <div class="tt-layout">
+      <div class="grid-scroll">
+        <table class="grid" id="grid-table" aria-label="Weekly class schedule"></table>
+      </div>
+      <div class="rail">
+        <div class="card">
+          <h3>Department key</h3>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="card">
+          <h3>Unscheduled offerings <span class="cnt" id="unsched-count"></span></h3>
+          <div id="unsched-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-setup">
+    <div class="setup-grid">
+      <div class="card">
+        <h3>Term details</h3>
+        <div class="field"><label for="in-school">School name</label><input id="in-school" type="text"></div>
+        <div class="field"><label for="in-term">Term label</label><input id="in-term" type="text"></div>
+        <button class="btn ghost" id="save-term-btn" style="align-self:flex-start;">Update term details</button>
+      </div>
+
+      <div class="card">
+        <h3>Course offerings <span class="cnt" id="offerings-count"></span></h3>
+        <div id="offerings-list"></div>
+        <form class="inline-form" id="offering-form">
+          <div class="field-row">
+            <div class="field"><label for="of-code">Code</label><input id="of-code" required placeholder="e.g. FIN301"></div>
+            <div class="field"><label for="of-section">Section</label><input id="of-section" required placeholder="A"></div>
+          </div>
+          <div class="field"><label for="of-title">Title</label><input id="of-title" required placeholder="Corporate Finance"></div>
+          <div class="field-row">
+            <div class="field"><label for="of-faculty">Faculty</label><select id="of-faculty"></select></div>
+            <div class="field"><label for="of-dept">Department (colour)</label><select id="of-dept"></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="of-credits">Credits</label><input id="of-credits" type="number" step="0.5" min="0.5" value="3" required></div>
+            <div class="field"><label for="of-enrolled">Enrolled</label><input id="of-enrolled" type="number" min="0" value="60" required></div>
+          </div>
+          <button class="btn" type="submit">Add offering</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Faculty <span class="cnt" id="faculty-count"></span></h3>
+        <div id="faculty-list"></div>
+        <form class="inline-form" id="faculty-form">
+          <div class="field"><label for="fa-name">Name</label><input id="fa-name" required placeholder="Prof. J. Alvarez"></div>
+          <div class="field"><label for="fa-dept">Department</label><input id="fa-dept" required placeholder="Finance"></div>
+          <button class="btn" type="submit">Add faculty</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Rooms <span class="cnt" id="rooms-count"></span></h3>
+        <div id="rooms-list"></div>
+        <form class="inline-form" id="room-form">
+          <div class="field"><label for="rm-name">Room name</label><input id="rm-name" required placeholder="Case Room 404"></div>
+          <div class="field"><label for="rm-cap">Capacity</label><input id="rm-cap" type="number" min="1" value="60" required></div>
+          <button class="btn" type="submit">Add room</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal-backdrop" id="class-modal-backdrop">
+  <div class="modal">
+    <h3 id="class-modal-title">Schedule a class</h3>
+    <div class="warn-box" id="class-warn"></div>
+    <div class="field"><label for="cm-offering">Course offering</label><select id="cm-offering"></select></div>
+    <div class="field"><label for="cm-room">Room</label><select id="cm-room"></select></div>
+    <div class="field-row">
+      <div class="field"><label for="cm-day">Day</label><select id="cm-day"></select></div>
+      <div class="field"><label for="cm-slot">Period</label><select id="cm-slot"></select></div>
+    </div>
+    <div class="field"><label>Faculty</label><div class="mono" id="cm-faculty-display" style="font-size:13.5px; color:var(--ink-2);">—</div></div>
+    <div class="modal-actions">
+      <div class="left">
+        <button class="btn ghost" id="cm-cancel" type="button">Cancel</button>
+        <button class="btn danger-outline" id="cm-delete" type="button" style="display:none;">Delete</button>
+      </div>
+      <button class="btn" id="cm-save" type="button">Schedule class</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script id="app-state" type="application/json">
+{"school":"Meridian School of Business","term":"Fall Term 2026 — MBA Term III","days":[{"id":"mon","label":"Monday"},{"id":"tue","label":"Tuesday"},{"id":"wed","label":"Wednesday"},{"id":"thu","label":"Thursday"},{"id":"fri","label":"Friday"}],"slots":[{"id":"p1","start":"08:30","end":"09:45"},{"id":"p2","start":"09:55","end":"11:10"},{"id":"p3","start":"11:20","end":"12:35"},{"id":"p4","start":"13:30","end":"14:45"},{"id":"p5","start":"14:55","end":"16:10"},{"id":"p6","start":"16:20","end":"17:35"}],"rooms":[{"id":"r1","name":"Case Room 201","capacity":70},{"id":"r2","name":"Case Room 305","capacity":70},{"id":"r3","name":"Seminar Room B","capacity":40},{"id":"r4","name":"Computer Lab 1","capacity":35},{"id":"r5","name":"Auditorium","capacity":180}],"faculty":[{"id":"f1","name":"Prof. A. Rangarajan","dept":"Finance"},{"id":"f2","name":"Prof. S. Bhatia","dept":"Marketing"},{"id":"f3","name":"Prof. D. Okafor","dept":"Strategy"},{"id":"f4","name":"Prof. L. Chen","dept":"Operations"},{"id":"f5","name":"Prof. M. Fernandes","dept":"Organizational Behavior"},{"id":"f6","name":"Prof. R. Iyer","dept":"Economics"}],"offerings":[{"id":"o1","code":"FIN301","title":"Corporate Finance","section":"A","facultyId":"f1","credits":3,"enrolled":65,"colorKey":"finance"},{"id":"o2","code":"MKT305","title":"Marketing Strategy","section":"A","facultyId":"f2","credits":3,"enrolled":68,"colorKey":"marketing"},{"id":"o3","code":"STR310","title":"Competitive Strategy","section":"A","facultyId":"f3","credits":3,"enrolled":70,"colorKey":"strategy"},{"id":"o4","code":"OPS288","title":"Operations Management","section":"A","facultyId":"f4","credits":3,"enrolled":62,"colorKey":"operations"},{"id":"o5","code":"OB220","title":"Leading Teams","section":"B","facultyId":"f5","credits":1.5,"enrolled":40,"colorKey":"ob"},{"id":"o6","code":"ECO150","title":"Managerial Economics","section":"A","facultyId":"f6","credits":3,"enrolled":70,"colorKey":"economics"},{"id":"o7","code":"FIN410","title":"Investment Banking","section":"Elective","facultyId":"f1","credits":1.5,"enrolled":35,"colorKey":"finance"},{"id":"o8","code":"MKT420","title":"Digital Marketing","section":"Elective","facultyId":"f2","credits":1.5,"enrolled":38,"colorKey":"marketing"}],"classes":[{"id":"c1","offeringId":"o1","roomId":"r1","day":"mon","slotId":"p1"},{"id":"c2","offeringId":"o2","roomId":"r2","day":"mon","slotId":"p2"},{"id":"c3","offeringId":"o3","roomId":"r1","day":"mon","slotId":"p3"},{"id":"c4","offeringId":"o4","roomId":"r2","day":"tue","slotId":"p1"},{"id":"c5","offeringId":"o6","roomId":"r5","day":"tue","slotId":"p2"},{"id":"c6","offeringId":"o1","roomId":"r1","day":"wed","slotId":"p1"},{"id":"c7","offeringId":"o3","roomId":"r1","day":"wed","slotId":"p3"},{"id":"c8","offeringId":"o2","roomId":"r2","day":"thu","slotId":"p2"},{"id":"c9","offeringId":"o5","roomId":"r3","day":"thu","slotId":"p4"},{"id":"c10","offeringId":"o6","roomId":"r5","day":"fri","slotId":"p1"},{"id":"c11","offeringId":"o4","roomId":"r2","day":"fri","slotId":"p3"}]}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var STORAGE_KEY = 'bschool-timetable-state';
+  var DEFAULT_STATE = JSON.parse(document.getElementById('app-state').textContent);
+  var STATE = loadState();
+  var editingClassId = null;
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){ /* localStorage unavailable — fall back to defaults */ }
+    return DEFAULT_STATE;
+  }
+
+  function uid(prefix){ return prefix + Math.random().toString(36).slice(2,9); }
+
+  function byId(arr,id){ for(var i=0;i<arr.length;i++){ if(arr[i].id===id) return arr[i]; } return null; }
+
+  function offeringLabel(o){
+    if(!o) return '—';
+    return o.code + ' — ' + o.title + ' (' + o.section + ')';
+  }
+  function facultyName(id){ var f=byId(STATE.faculty,id); return f ? f.name : '—'; }
+  function roomName(id){ var r=byId(STATE.rooms,id); return r ? r.name : '—'; }
+  function slotLabel(id){ var s=byId(STATE.slots,id); return s ? (s.start+'–'+s.end) : ''; }
+  function dayLabel(id){ var d=byId(STATE.days,id); return d ? d.label : id; }
+
+  function classesInSlot(day, slotId){
+    return STATE.classes.filter(function(c){ return c.day===day && c.slotId===slotId; });
+  }
+
+  function conflictSet(){
+    // returns Set of class ids that share a room or a faculty at the same day+slot
+    var byRoomSlot = {}, byFacSlot = {}, conflicted = {};
+    STATE.classes.forEach(function(c){
+      var off = byId(STATE.offerings, c.offeringId);
+      var rk = c.day+'|'+c.slotId+'|room|'+c.roomId;
+      var fk = off ? (c.day+'|'+c.slotId+'|fac|'+off.facultyId) : null;
+      (byRoomSlot[rk] = byRoomSlot[rk]||[]).push(c.id);
+      if(fk) (byFacSlot[fk] = byFacSlot[fk]||[]).push(c.id);
+    });
+    [byRoomSlot, byFacSlot].forEach(function(map){
+      Object.keys(map).forEach(function(k){
+        if(map[k].length>1){ map[k].forEach(function(id){ conflicted[id]=true; }); }
+      });
+    });
+    return conflicted;
+  }
+
+  function wouldConflict(day, slotId, roomId, facultyId, excludeClassId){
+    var reasons = [];
+    STATE.classes.forEach(function(c){
+      if(c.id===excludeClassId) return;
+      if(c.day!==day || c.slotId!==slotId) return;
+      if(c.roomId===roomId){
+        var o = byId(STATE.offerings, c.offeringId);
+        reasons.push('Room is already booked for ' + (o?o.code:'another class') + '.');
+      }
+      var co = byId(STATE.offerings, c.offeringId);
+      if(co && co.facultyId===facultyId){
+        reasons.push(facultyName(facultyId) + ' already teaches ' + co.code + ' in this period.');
+      }
+    });
+    return reasons;
+  }
+
+  var DEPT_COLORS = [
+    {key:'finance', label:'Finance'}, {key:'marketing', label:'Marketing'},
+    {key:'strategy', label:'Strategy'}, {key:'operations', label:'Operations'},
+    {key:'ob', label:'Org. Behavior'}, {key:'economics', label:'Economics'}
+  ];
+
+  function render(){
+    document.getElementById('school-name').textContent = STATE.school;
+    document.getElementById('school-term').textContent = STATE.term;
+    document.getElementById('in-school').value = STATE.school;
+    document.getElementById('in-term').value = STATE.term;
+
+    renderGrid();
+    renderLegend();
+    renderUnscheduled();
+    renderOfferings();
+    renderFaculty();
+    renderRooms();
+    renderStats();
+  }
+
+  function renderStats(){
+    var conf = conflictSet();
+    document.getElementById('stat-classes').textContent = STATE.classes.length;
+    var schedOffIds = {};
+    STATE.classes.forEach(function(c){ schedOffIds[c.offeringId]=true; });
+    var unsched = STATE.offerings.filter(function(o){ return !schedOffIds[o.id]; }).length;
+    document.getElementById('stat-unsched').textContent = unsched;
+    document.getElementById('stat-conflicts').textContent = Object.keys(conf).length;
+  }
+
+  function renderGrid(){
+    var conf = conflictSet();
+    var table = document.getElementById('grid-table');
+    var html = '<thead><tr><th class="time-col">Period</th>';
+    STATE.days.forEach(function(d){ html += '<th>'+esc(d.label)+'</th>'; });
+    html += '</tr></thead><tbody>';
+    STATE.slots.forEach(function(s){
+      html += '<tr><td class="time-col"><span class="p">Period</span>'+esc(s.start)+'–'+esc(s.end)+'</td>';
+      STATE.days.forEach(function(d){
+        var items = classesInSlot(d.id, s.id);
+        html += '<td class="cell"><div class="cell-inner">';
+        items.forEach(function(c){
+          var o = byId(STATE.offerings, c.offeringId);
+          var room = byId(STATE.rooms, c.roomId);
+          var over = o && room && o.enrolled > room.capacity;
+          var isConf = !!conf[c.id];
+          html += '<div class="chip c-'+(o?o.colorKey:'finance')+(isConf?' conflict':'')+'" data-class-id="'+c.id+'" tabindex="0" role="button" title="Edit class">';
+          if(isConf) html += '<span class="flag" title="Scheduling conflict">⚠</span>';
+          else if(over) html += '<span class="flag" title="Over room capacity">●</span>';
+          html += '<span class="code">'+esc(o?o.code:'?')+'</span>';
+          html += '<span class="meta">'+esc(room?room.name:'')+' &middot; '+esc(facultyName(o?o.facultyId:null).replace('Prof. ',''))+'</span>';
+          html += '</div>';
+        });
+        html += '<button class="add-btn" data-add-day="'+d.id+'" data-add-slot="'+s.id+'" aria-label="Add class" type="button">+</button>';
+        html += '</div></td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+
+    table.querySelectorAll('.chip').forEach(function(el){
+      el.addEventListener('click', function(){ openEditModal(el.getAttribute('data-class-id')); });
+      el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openEditModal(el.getAttribute('data-class-id')); } });
+    });
+    table.querySelectorAll('.add-btn').forEach(function(el){
+      el.addEventListener('click', function(){
+        openAddModal(el.getAttribute('data-add-day'), el.getAttribute('data-add-slot'));
+      });
+    });
+  }
+
+  function renderLegend(){
+    var el = document.getElementById('legend');
+    el.innerHTML = DEPT_COLORS.map(function(c){
+      return '<span class="sw"><span class="dot c-'+c.key+'"></span>'+c.label+'</span>';
+    }).join('');
+  }
+
+  function renderUnscheduled(){
+    var schedOffIds = {};
+    STATE.classes.forEach(function(c){ schedOffIds[c.offeringId]=true; });
+    var list = STATE.offerings.filter(function(o){ return !schedOffIds[o.id]; });
+    document.getElementById('unsched-count').textContent = list.length ? ('('+list.length+')') : '';
+    var wrap = document.getElementById('unsched-list');
+    if(!list.length){ wrap.innerHTML = '<p class="empty-note">Every offering has at least one class scheduled.</p>'; return; }
+    wrap.innerHTML = list.map(function(o){
+      return '<div class="unsched-item">' +
+        '<div><span class="u-code">'+esc(o.code)+'</span><div class="u-sub">'+esc(o.title)+' &middot; '+esc(facultyName(o.facultyId))+'</div></div>' +
+        '<button class="btn-sm" data-sched="'+o.id+'" type="button">Schedule</button>' +
+        '</div>';
+    }).join('');
+    wrap.querySelectorAll('[data-sched]').forEach(function(btn){
+      btn.addEventListener('click', function(){ openAddModal(null, null, btn.getAttribute('data-sched')); });
+    });
+  }
+
+  function renderOfferings(){
+    document.getElementById('offerings-count').textContent = '('+STATE.offerings.length+')';
+    var wrap = document.getElementById('offerings-list');
+    wrap.innerHTML = STATE.offerings.map(function(o){
+      return '<div class="list-row"><div><div class="main">'+esc(o.code)+' — '+esc(o.title)+' ('+esc(o.section)+')</div>' +
+        '<div class="sub">'+esc(facultyName(o.facultyId))+' &middot; '+o.credits+' cr &middot; '+o.enrolled+' enrolled</div></div>' +
+        '<div class="row-actions"><button class="del" data-del-off="'+o.id+'" type="button">Remove</button></div></div>';
+    }).join('') || '<p class="empty-note">No offerings yet.</p>';
+    wrap.querySelectorAll('[data-del-off]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-del-off');
+        if(STATE.classes.some(function(c){return c.offeringId===id;})){
+          toast('Remove its scheduled classes first.'); return;
+        }
+        STATE.offerings = STATE.offerings.filter(function(o){return o.id!==id;});
+        persist('Offering removed.');
+      });
+    });
+
+    var facSel = document.getElementById('of-faculty');
+    facSel.innerHTML = STATE.faculty.map(function(f){ return '<option value="'+f.id+'">'+esc(f.name)+'</option>'; }).join('');
+    var deptSel = document.getElementById('of-dept');
+    deptSel.innerHTML = DEPT_COLORS.map(function(d){ return '<option value="'+d.key+'">'+d.label+'</option>'; }).join('');
+  }
+
+  function renderFaculty(){
+    document.getElementById('faculty-count').textContent = '('+STATE.faculty.length+')';
+    var wrap = document.getElementById('faculty-list');
+    wrap.innerHTML = STATE.faculty.map(function(f){
+      return '<div class="list-row"><div><div class="main">'+esc(f.name)+'</div><div class="sub">'+esc(f.dept)+'</div></div>' +
+        '<div class="row-actions"><button class="del" data-del-fac="'+f.id+'" type="button">Remove</button></div></div>';
+    }).join('') || '<p class="empty-note">No faculty yet.</p>';
+    wrap.querySelectorAll('[data-del-fac]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-del-fac');
+        if(STATE.offerings.some(function(o){return o.facultyId===id;})){
+          toast('This faculty member teaches an offering — reassign it first.'); return;
+        }
+        STATE.faculty = STATE.faculty.filter(function(f){return f.id!==id;});
+        persist('Faculty removed.');
+      });
+    });
+  }
+
+  function renderRooms(){
+    document.getElementById('rooms-count').textContent = '('+STATE.rooms.length+')';
+    var wrap = document.getElementById('rooms-list');
+    wrap.innerHTML = STATE.rooms.map(function(r){
+      return '<div class="list-row"><div><div class="main">'+esc(r.name)+'</div><div class="sub">Capacity '+r.capacity+'</div></div>' +
+        '<div class="row-actions"><button class="del" data-del-room="'+r.id+'" type="button">Remove</button></div></div>';
+    }).join('') || '<p class="empty-note">No rooms yet.</p>';
+    wrap.querySelectorAll('[data-del-room]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-del-room');
+        if(STATE.classes.some(function(c){return c.roomId===id;})){
+          toast('This room has classes scheduled in it — move them first.'); return;
+        }
+        STATE.rooms = STATE.rooms.filter(function(r){return r.id!==id;});
+        persist('Room removed.');
+      });
+    });
+  }
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+
+  /* ---------- modal ---------- */
+  var backdrop = document.getElementById('class-modal-backdrop');
+
+  function fillModalSelectors(){
+    var offSel = document.getElementById('cm-offering');
+    offSel.innerHTML = STATE.offerings.map(function(o){ return '<option value="'+o.id+'">'+esc(offeringLabel(o))+'</option>'; }).join('');
+    var roomSel = document.getElementById('cm-room');
+    roomSel.innerHTML = STATE.rooms.map(function(r){ return '<option value="'+r.id+'">'+esc(r.name)+' (cap '+r.capacity+')</option>'; }).join('');
+    var daySel = document.getElementById('cm-day');
+    daySel.innerHTML = STATE.days.map(function(d){ return '<option value="'+d.id+'">'+esc(d.label)+'</option>'; }).join('');
+    var slotSel = document.getElementById('cm-slot');
+    slotSel.innerHTML = STATE.slots.map(function(s){ return '<option value="'+s.id+'">'+esc(s.start+'–'+s.end)+'</option>'; }).join('');
+  }
+
+  function updateFacultyDisplay(){
+    var offId = document.getElementById('cm-offering').value;
+    var o = byId(STATE.offerings, offId);
+    document.getElementById('cm-faculty-display').textContent = o ? facultyName(o.facultyId) : '—';
+  }
+
+  function checkModalConflict(){
+    var offId = document.getElementById('cm-offering').value;
+    var roomId = document.getElementById('cm-room').value;
+    var day = document.getElementById('cm-day').value;
+    var slotId = document.getElementById('cm-slot').value;
+    var o = byId(STATE.offerings, offId);
+    var reasons = o ? wouldConflict(day, slotId, roomId, o.facultyId, editingClassId) : [];
+    var box = document.getElementById('class-warn');
+    var saveBtn = document.getElementById('cm-save');
+    if(reasons.length){
+      box.innerHTML = reasons.map(esc).join('<br>');
+      box.classList.add('show');
+      saveBtn.textContent = 'Save anyway';
+      saveBtn.classList.add('warn');
+    } else {
+      box.classList.remove('show');
+      saveBtn.textContent = editingClassId ? 'Save changes' : 'Schedule class';
+      saveBtn.classList.remove('warn');
+    }
+  }
+
+  function openAddModal(day, slotId, offeringId){
+    editingClassId = null;
+    fillModalSelectors();
+    document.getElementById('class-modal-title').textContent = 'Schedule a class';
+    document.getElementById('cm-delete').style.display = 'none';
+    if(offeringId) document.getElementById('cm-offering').value = offeringId;
+    if(day) document.getElementById('cm-day').value = day;
+    if(slotId) document.getElementById('cm-slot').value = slotId;
+    updateFacultyDisplay();
+    checkModalConflict();
+    backdrop.classList.add('open');
+  }
+
+  function openEditModal(classId){
+    var c = byId(STATE.classes, classId);
+    if(!c) return;
+    editingClassId = classId;
+    fillModalSelectors();
+    document.getElementById('class-modal-title').textContent = 'Edit class';
+    document.getElementById('cm-delete').style.display = '';
+    document.getElementById('cm-offering').value = c.offeringId;
+    document.getElementById('cm-room').value = c.roomId;
+    document.getElementById('cm-day').value = c.day;
+    document.getElementById('cm-slot').value = c.slotId;
+    updateFacultyDisplay();
+    checkModalConflict();
+    backdrop.classList.add('open');
+  }
+
+  function closeModal(){ backdrop.classList.remove('open'); editingClassId = null; }
+
+  ['cm-offering','cm-room','cm-day','cm-slot'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', function(){ updateFacultyDisplay(); checkModalConflict(); });
+  });
+  document.getElementById('cm-cancel').addEventListener('click', closeModal);
+  backdrop.addEventListener('click', function(e){ if(e.target===backdrop) closeModal(); });
+
+  document.getElementById('cm-save').addEventListener('click', function(){
+    var offId = document.getElementById('cm-offering').value;
+    var roomId = document.getElementById('cm-room').value;
+    var day = document.getElementById('cm-day').value;
+    var slotId = document.getElementById('cm-slot').value;
+    if(!offId || !roomId){ toast('Choose an offering and a room.'); return; }
+    if(editingClassId){
+      var c = byId(STATE.classes, editingClassId);
+      c.offeringId = offId; c.roomId = roomId; c.day = day; c.slotId = slotId;
+    } else {
+      STATE.classes.push({id: uid('c'), offeringId: offId, roomId: roomId, day: day, slotId: slotId});
+    }
+    closeModal();
+    persist('Timetable updated.');
+  });
+
+  document.getElementById('cm-delete').addEventListener('click', function(){
+    if(!editingClassId) return;
+    STATE.classes = STATE.classes.filter(function(c){ return c.id!==editingClassId; });
+    closeModal();
+    persist('Class removed.');
+  });
+
+  /* ---------- setup forms ---------- */
+  document.getElementById('offering-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    STATE.offerings.push({
+      id: uid('o'),
+      code: document.getElementById('of-code').value.trim().toUpperCase(),
+      title: document.getElementById('of-title').value.trim(),
+      section: document.getElementById('of-section').value.trim(),
+      facultyId: document.getElementById('of-faculty').value,
+      colorKey: document.getElementById('of-dept').value,
+      credits: parseFloat(document.getElementById('of-credits').value)||1,
+      enrolled: parseInt(document.getElementById('of-enrolled').value,10)||0
+    });
+    e.target.reset();
+    document.getElementById('of-credits').value = 3;
+    document.getElementById('of-enrolled').value = 60;
+    persist('Offering added.');
+  });
+
+  document.getElementById('faculty-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    STATE.faculty.push({
+      id: uid('f'),
+      name: document.getElementById('fa-name').value.trim(),
+      dept: document.getElementById('fa-dept').value.trim()
+    });
+    e.target.reset();
+    persist('Faculty added.');
+  });
+
+  document.getElementById('room-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    STATE.rooms.push({
+      id: uid('r'),
+      name: document.getElementById('rm-name').value.trim(),
+      capacity: parseInt(document.getElementById('rm-cap').value,10)||1
+    });
+    e.target.reset();
+    document.getElementById('rm-cap').value = 60;
+    persist('Room added.');
+  });
+
+  document.getElementById('save-term-btn').addEventListener('click', function(){
+    STATE.school = document.getElementById('in-school').value.trim() || STATE.school;
+    STATE.term = document.getElementById('in-term').value.trim() || STATE.term;
+    persist('Term details updated.');
+  });
+
+  /* ---------- tabs ---------- */
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('panel-'+tab.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+
+  document.getElementById('stat-conflicts-box').addEventListener('click', function(){
+    var conf = conflictSet();
+    var ids = Object.keys(conf);
+    if(!ids.length){ toast('No conflicts right now.'); return; }
+    var el = document.querySelector('.chip[data-class-id="'+ids[0]+'"]');
+    if(el){ el.scrollIntoView({behavior:'smooth', block:'center', inline:'center'}); el.focus(); }
+  });
+
+  /* ---------- toast ---------- */
+  var toastTimer = null;
+  function toast(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
+  }
+
+  /* ---------- persistence: browser localStorage (this file runs standalone / on GitHub Pages) ---------- */
+  function persist(msg){
+    render();
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+      toast(msg);
+    }catch(e){
+      toast(msg + ' (could not save — browser storage unavailable)');
+    }
+  }
+
+  /* ---------- boot ---------- */
+  render();
+})();
+</script>
+
+</body>
+</html>
