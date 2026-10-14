@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Goldman — a poem by Rajat Sharma</title>
+<meta name="description" content="A light-hearted poem by Rajat Sharma: a tiger, a well full of gold, and a very untimely phone call.">
+<style>
+  :root{
+    --navy:#0b1d33; --ink:#1b2431; --ink-soft:#4f5866; --paper:#f6f7f9;
+    --card:#ffffff; --line:#e3e7ed; --accent:#b8863a; --accent-text:#8a5f1c;
+    --sans:'Helvetica Neue',Arial,ui-sans-serif,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);
+    font-family:'Georgia','Iowan Old Style',ui-serif,serif;
+    background:
+      radial-gradient(circle at 85% 8%, rgba(184,134,58,0.10), transparent 40%),
+      linear-gradient(180deg,#ffffff 0%,var(--paper) 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  :focus-visible{outline:3px solid #1f5fbf;outline-offset:3px;border-radius:6px;}
+  header{
+    max-width:1040px;margin:0 auto;padding:22px 24px;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  .brand{font-family:var(--sans);font-weight:700;letter-spacing:0.5px;color:var(--navy);text-decoration:none;}
+  .back{font-family:var(--sans);font-size:0.9rem;font-weight:600;color:var(--navy);text-decoration:none;
+        border:1.5px solid var(--navy);padding:8px 16px;border-radius:30px;white-space:nowrap;}
+  .back:hover{background:#e8edf4;}
+  main{max-width:1040px;margin:0 auto;padding:8px 24px 72px;}
+  article{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    border-top:4px solid var(--accent);
+    box-shadow:0 14px 40px rgba(11,29,51,0.07);
+    padding:48px 56px 52px;
+  }
+  .kicker{font-family:var(--sans);font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;
+          color:var(--accent-text);font-weight:700;margin:0 0 10px;}
+  h1{font-family:var(--sans);font-size:clamp(1.9rem,4.5vw,2.6rem);line-height:1.15;color:var(--navy);margin:0 0 8px;letter-spacing:-0.01em;}
+  .byline{font-family:var(--sans);color:var(--ink-soft);font-size:0.95rem;margin:0 0 36px;}
+  .poem{font-style:italic;font-size:1.16rem;line-height:1.85;color:var(--ink);}
+  .poem p{margin:0 0 1.6em;}
+  .poem p:last-child{margin-bottom:0;}
+  .poem .beat{color:var(--accent-text);font-weight:600;}
+  .fin{text-align:center;color:var(--accent);margin:40px 0 0;font-size:1.3rem;letter-spacing:10px;}
+  footer{text-align:center;font-family:var(--sans);font-size:0.82rem;color:var(--ink-soft);padding:0 24px 32px;}
+  /* Poem + illustration side by side */
+  .layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);gap:32px;align-items:start;}
+  .art{position:sticky;top:24px;margin:0;}
+  .art svg{display:block;width:100%;height:auto;border-radius:16px;box-shadow:0 14px 40px rgba(11,29,51,0.18);}
+  .art figcaption{font-family:var(--sans);font-size:0.85rem;color:var(--ink-soft);text-align:center;margin-top:12px;line-height:1.5;}
+  @media (prefers-reduced-motion: no-preference){
+    .twinkle{animation:tw 2.6s ease-in-out infinite;}
+    .twinkle.d2{animation-delay:.9s;} .twinkle.d3{animation-delay:1.7s;}
+    .ring{animation:ring 1.6s ease-out infinite;transform-origin:332px 470px;}
+    @keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+    @keyframes ring{0%{opacity:.9}100%{opacity:0}}
+  }
+  @media (max-width:860px){
+    .layout{grid-template-columns:1fr;}
+    .art{position:static;order:-1;max-width:260px;margin:0 auto;}
+  }
+  @media (max-width:600px){
+    article{padding:32px 24px 36px;}
+    .poem{font-size:1.06rem;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html">RAJAT SHARMA</a>
+  <a class="back" href="index.html#extracurriculars">← Back to site</a>
+</header>
+
+<main>
+  <div class="layout">
+  <article>
+    <p class="kicker">Theatre &amp; Poetry</p>
+    <h1>The Goldman</h1>
+    <p class="byline">A poem by Rajat Sharma</p>
+
+    <div class="poem">
+      <p>Coming here, before the first week,<br>
+      while walking along a creek —<br>
+      away from the honk of cars,<br>
+      was enjoying the greeneries of grass.</p>
+
+      <p>Across the creek, on my left, saw a creature…<br>
+      Cleared my specs — <span class="beat">it was a tiger!</span><br>
+      Sun already had set, when our eyes met.</p>
+
+      <p>It growled, challenging me for a fight.<br>
+      Given the brave man I was,<br>
+      I gathered my strength, turned right —<br>
+      and ran with all my might!</p>
+
+      <p>After a few hundred metres,<br>
+      and some quivers…<br>
+      I fell — into what looked like a well.</p>
+
+      <p>Inside the well, in dark night,<br>
+      under the moonlight,<br>
+      something was glittering bright…<br>
+      <span class="beat">Coins! Coins of gold!</span><br>
+      Gold, with heaps of so many bags,<br>
+      that I felt like the Goldman of Goldman Sachs.</p>
+
+      <p>I dropped my plan of IIM;<br>
+      thought — will open a bank named <span class="beat">The Goldway</span>,<br>
+      and hire MBAs!</p>
+
+      <p>My ringtone went up…<br>
+      Rolling my eyes — I woke up!</p>
+
+      <p>“Good morning, Sir,” said someone on the phone,<br>
+      “I am from SBI — come sign your loan.”</p>
+
+      <p>I am running out of time,<br>
+      and words that can rhyme…<br>
+      So, my dear folks —<br>
+      that’s where I close.</p>
+    </div>
+    <p class="fin" aria-hidden="true">· · ·</p>
+  </article>
+  <figure class="art">
+    <svg viewBox="0 0 400 560" role="img" aria-labelledby="art-title">
+      <title id="art-title">Illustration: a tiger watching from across a moonlit creek, a well glowing with gold coins, and a ringing phone</title>
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0b1d33"/><stop offset="1" stop-color="#1f3a5f"/>
+        </linearGradient>
+        <radialGradient id="moonGlow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#f5ead8" stop-opacity=".55"/><stop offset="1" stop-color="#f5ead8" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="goldGlow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#ffd97a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd97a" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="water" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#3d6a96"/><stop offset=".5" stop-color="#7fa6c9"/><stop offset="1" stop-color="#3d6a96"/>
+        </linearGradient>
+        <linearGradient id="coin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#c8902e"/>
+        </linearGradient>
+      </defs>
+
+      <!-- night sky -->
+      <rect width="400" height="560" fill="url(#sky)"/>
+      <g fill="#f5ead8">
+        <circle class="twinkle" cx="40" cy="50" r="1.6"/><circle class="twinkle d2" cx="120" cy="30" r="1.3"/>
+        <circle class="twinkle d3" cx="190" cy="70" r="1.8"/><circle class="twinkle" cx="240" cy="28" r="1.2"/>
+        <circle class="twinkle d2" cx="80" cy="110" r="1.2"/><circle class="twinkle d3" cx="370" cy="160" r="1.5"/>
+        <circle class="twinkle" cx="160" cy="140" r="1.1"/><circle class="twinkle d2" cx="360" cy="40" r="1.3"/>
+      </g>
+
+      <!-- moon -->
+      <circle cx="300" cy="96" r="78" fill="url(#moonGlow)"/>
+      <circle cx="300" cy="96" r="34" fill="#f5ead8"/>
+      <circle cx="288" cy="88" r="5" fill="#e6d6b8"/><circle cx="310" cy="106" r="7" fill="#e6d6b8"/><circle cx="314" cy="82" r="3" fill="#e6d6b8"/>
+
+      <!-- far hills -->
+      <path d="M0 230 Q70 180 140 215 T280 205 T400 200 V300 H0Z" fill="#14304f"/>
+      <path d="M0 255 Q90 215 180 245 T400 235 V310 H0Z" fill="#1a3a5c"/>
+
+      <!-- tiger across the creek, peeking from the grass -->
+      <g transform="translate(96 232)">
+        <circle cx="-26" cy="-26" r="11" fill="#d9822b"/><circle cx="-26" cy="-26" r="5" fill="#2a1a0e"/>
+        <circle cx="26" cy="-26" r="11" fill="#d9822b"/><circle cx="26" cy="-26" r="5" fill="#2a1a0e"/>
+        <ellipse cx="0" cy="0" rx="38" ry="33" fill="#e58d2f"/>
+        <path d="M-6 -32 L0 -18 L6 -32 M-20 -28 L-14 -16 M20 -28 L14 -16 M-38 -4 L-24 0 M-37 8 L-24 9 M38 -4 L24 0 M37 8 L24 9" stroke="#2a1a0e" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+        <ellipse cx="0" cy="15" rx="20" ry="14" fill="#fbf1e2"/>
+        <path d="M-5 9 h10 l-5 6z" fill="#2a1a0e"/>
+        <ellipse cx="-14" cy="-6" rx="7" ry="5.5" fill="#f3e45a"/><ellipse cx="14" cy="-6" rx="7" ry="5.5" fill="#f3e45a"/>
+        <ellipse cx="-14" cy="-6" rx="2" ry="4.5" fill="#1b1206"/><ellipse cx="14" cy="-6" rx="2" ry="4.5" fill="#1b1206"/>
+      </g>
+      <g stroke="#2f5d3a" stroke-width="4" stroke-linecap="round">
+        <path d="M44 280 l6 -34 M58 282 l2 -28 M70 282 l-4 -22 M120 282 l4 -30 M134 282 l-2 -26 M146 282 l6 -20 M84 284 l1 -14 M106 284 l-2 -12"/>
+      </g>
+
+      <!-- the creek -->
+      <path d="M0 282 Q100 270 200 284 T400 280 V312 Q300 324 200 310 T0 316Z" fill="url(#water)" opacity=".9"/>
+      <path d="M40 296 h40 M150 300 h30 M260 294 h50 M330 304 h26" stroke="#d6e6f4" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+
+      <!-- near bank -->
+      <path d="M0 312 Q200 300 400 314 V560 H0Z" fill="#16324f"/>
+      <g stroke="#2a5a3a" stroke-width="3" stroke-linecap="round" opacity=".9">
+        <path d="M24 340 l4 -16 M34 342 l-2 -14 M352 336 l3 -16 M364 338 l-3 -12 M378 340 l2 -14"/>
+      </g>
+
+      <!-- little footprints running away (turned right!) -->
+      <g fill="#26486c">
+        <ellipse cx="236" cy="336" rx="5" ry="3"/><ellipse cx="252" cy="346" rx="5" ry="3"/>
+        <ellipse cx="248" cy="360" rx="5" ry="3"/><ellipse cx="226" cy="372" rx="5" ry="3"/>
+      </g>
+
+      <!-- the well, glowing with gold -->
+      <ellipse cx="190" cy="408" rx="140" ry="70" fill="url(#goldGlow)" opacity=".55"/>
+      <path d="M92 410 V510 Q190 540 288 510 V410Z" fill="#5c6b7a"/>
+      <g stroke="#46535f" stroke-width="2" fill="none">
+        <path d="M92 440 Q190 466 288 440 M92 472 Q190 498 288 472"/>
+        <path d="M130 418 v28 M190 424 v30 M250 418 v28 M160 452 v30 M220 452 v30 M128 484 v28 M252 484 v28"/>
+      </g>
+      <ellipse cx="190" cy="410" rx="98" ry="24" fill="#7a8896"/>
+      <ellipse cx="190" cy="410" rx="84" ry="18" fill="#1a1206"/>
+      <ellipse cx="190" cy="412" rx="70" ry="13" fill="url(#goldGlow)"/>
+      <!-- coins bursting out -->
+      <g stroke="#9a6a1c" stroke-width="1.5">
+        <ellipse cx="160" cy="404" rx="12" ry="5" fill="url(#coin)"/>
+        <ellipse cx="190" cy="400" rx="12" ry="5" fill="url(#coin)"/>
+        <ellipse cx="218" cy="405" rx="12" ry="5" fill="url(#coin)"/>
+        <ellipse cx="176" cy="396" rx="12" ry="5" fill="url(#coin)"/>
+        <ellipse cx="204" cy="394" rx="12" ry="5" fill="url(#coin)"/>
+        <circle cx="150" cy="372" r="9" fill="url(#coin)"/>
+        <circle cx="228" cy="362" r="10" fill="url(#coin)"/>
+        <circle cx="192" cy="350" r="8" fill="url(#coin)"/>
+      </g>
+      <g fill="#fff3c4">
+        <path class="twinkle" d="M120 364 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/>
+        <path class="twinkle d2" d="M262 384 l2.4 6 6 2.4 -6 2.4 -2.4 6 -2.4 -6 -6 -2.4 6 -2.4z"/>
+        <path class="twinkle d3" d="M206 330 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z"/>
+      </g>
+
+      <!-- the phone that ends the dream -->
+      <g transform="rotate(-14 332 470)">
+        <rect x="316" y="440" width="32" height="58" rx="6" fill="#0b1d33" stroke="#b8863a" stroke-width="2"/>
+        <rect x="320" y="448" width="24" height="38" rx="2" fill="#f5ead8"/>
+        <circle cx="332" cy="492" r="2.4" fill="#b8863a"/>
+      </g>
+      <g fill="none" stroke="#f5ead8" stroke-width="2.4" stroke-linecap="round">
+        <path class="ring" d="M366 446 q10 18 0 36 M376 438 q16 26 0 52"/>
+        <path class="ring" d="M300 450 q-10 18 0 36 M290 442 q-16 26 0 52"/>
+      </g>
+      <text x="200" y="545" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="15" fill="#d9c39b">…and then the phone rang.</text>
+    </svg>
+    <figcaption>A tiger, a well of gold, and a very untimely phone call.</figcaption>
+  </figure>
+  </div>
+</main>
+
+<footer>© <span id="year">2026</span> Rajat Sharma</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
